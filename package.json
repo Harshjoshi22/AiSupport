@@ -1,0 +1,29 @@
+{
+  "name": "ai-supporthub",
+  "version": "1.0.0",
+  "description": "AI SupportHub - Standalone AI-Powered Customer Support SaaS Platform",
+  "main": "server/src/server.js",
+  "scripts": {
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "server": "npm --prefix server run dev",
+    "client": "npm --prefix client run dev",
+    "install:all": "npm install && npm --prefix server install && npm --prefix client install",
+    "seed": "npm --prefix server run seed",
+    "build": "npm --prefix client run build",
+    "start": "npm --prefix server start"
+  },
+  "keywords": [
+    "ai-customer-support",
+    "saas",
+    "mern",
+    "rag",
+    "socket.io",
+    "gemini",
+    "openai"
+  ],
+  "author": "AI SupportHub Team",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
