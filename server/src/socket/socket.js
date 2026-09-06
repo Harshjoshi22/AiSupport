@@ -5,11 +5,22 @@ import { logger } from '../utils/logger.js';
 let io = null;
 
 export const initSocket = (httpServer) => {
-  const clientUrl = process.env.CLIENT_URL || 'http://localhost:5173';
+  const allowedOrigins = [
+    'http://localhost:5173',
+    'http://127.0.0.1:5173',
+    ...(process.env.CLIENT_URL ? process.env.CLIENT_URL.split(',').map((url) => url.trim().replace(/\/$/, '')) : []),
+  ];
 
   io = new Server(httpServer, {
     cors: {
-      origin: [clientUrl, 'http://localhost:5173', 'http://127.0.0.1:5173'],
+      origin: (origin, callback) => {
+        if (!origin) return callback(null, true);
+        const cleanOrigin = origin.replace(/\/$/, '');
+        if (allowedOrigins.includes(cleanOrigin) || /\.vercel\.app$/.test(cleanOrigin)) {
+          return callback(null, true);
+        }
+        return callback(new Error('Origin not allowed by Socket CORS'));
+      },
       methods: ['GET', 'POST', 'PUT', 'DELETE'],
       credentials: true,
     },

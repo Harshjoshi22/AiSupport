@@ -28,16 +28,31 @@ app.use(
   })
 );
 
-// CORS configuration
-const clientUrl = process.env.CLIENT_URL || 'http://localhost:5173';
-app.use(
-  cors({
-    origin: [clientUrl, 'http://localhost:5173', 'http://127.0.0.1:5173'],
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-  })
-);
+const allowedOrigins = [
+  'http://localhost:5173',
+  'http://localhost:3000',
+  'http://127.0.0.1:5173',
+  ...(process.env.CLIENT_URL ? process.env.CLIENT_URL.split(',').map((url) => url.trim().replace(/\/$/, '')) : []),
+];
+const corsOptions = {
+  origin: (origin, callback) => {
+    // Allow requests with no origin (e.g. mobile apps, postman, server-to-server)
+    if (!origin) return callback(null, true);
+    const cleanOrigin = origin.replace(/\/$/, '');
+    const isAllowed =
+      allowedOrigins.includes(cleanOrigin) ||
+      /\.vercel\.app$/.test(cleanOrigin);
+    if (isAllowed) {
+      callback(null, true);
+    } else {
+      callback(new Error(`Origin ${origin} not allowed by CORS`));
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+};
+app.use(cors(corsOptions));
 
 // Body Parsers
 app.use(express.json({ limit: '10mb' }));
