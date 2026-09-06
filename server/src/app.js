@@ -74,6 +74,16 @@ const generalLimiter = rateLimit({
 });
 app.use('/api', generalLimiter);
 
+// Root Endpoint (For Render load balancers and health checks)
+app.get('/', (req, res) => {
+  res.status(200).json({
+    status: 'online',
+    service: 'AI SupportHub API',
+    message: 'Backend server is running smoothly',
+    timestamp: new Date().toISOString(),
+  });
+});
+
 // Health Check Endpoint
 app.get('/api/health', (req, res) => {
   res.status(200).json({
